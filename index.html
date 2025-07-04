@@ -16,77 +16,70 @@
       }
     </style>
     <script>
-      // إحداثيات مركز حفر الباطن
       const targetLat = 28.4106;
       const targetLng = 46.7392;
       const maxDistanceKm = 10;
 
-      function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+      function getDistance(lat1, lon1, lat2, lon2) {
         const R = 6371;
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const dLat = (lat2 - lat1) * (Math.PI / 180);
+        const dLon = (lon2 - lon1) * (Math.PI / 180);
         const a =
           Math.sin(dLat / 2) * Math.sin(dLat / 2) +
           Math.cos(lat1 * Math.PI / 180) *
-          Math.cos(lat2 * Math.PI / 180) *
-          Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) *
+            Math.sin(dLon / 2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c;
       }
 
       function openFormWithLocation() {
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            function (position) {
-              const lat = position.coords.latitude;
-              const lon = position.coords.longitude;
-
-              const distance = getDistanceFromLatLonInKm(
-                lat,
-                lon,
-                targetLat,
-                targetLng
-              );
-
-              if (distance <= maxDistanceKm) {
-                // داخل حفر الباطن: نوجّه المستخدم إلى النموذج
-                const formBaseURL =
-                  "https://docs.google.com/forms/d/e/1FAIpQLSdvGGgzSLSQMpDI7XnJRM2tv49w1mgZHeIiJ3h-ajxH1OcJYA/viewform";
-
-                // entry.776050980 هو رقم حقل الموقع في Google Form
-                const fullURL = `${formBaseURL}?entry.776050980=${lat},${lon}`;
-
-                window.location.href = fullURL;
-              } else {
-                // المستخدم خارج المنطقة
-                document.getElementById("loadingMsg").style.display = "none";
-                document.getElementById("errorMsg").style.display = "block";
-              }
-            },
-            function () {
-              document.getElementById("loadingMsg").style.display = "none";
-              document.getElementById("errorMsg").innerText =
-                "تعذر تحديد الموقع. تأكدي أن الموقع مفعل.";
-              document.getElementById("errorMsg").style.display = "block";
-            }
-          );
-        } else {
-          document.getElementById("loadingMsg").style.display = "none";
-          document.getElementById("errorMsg").innerText =
-            "المتصفح لا يدعم تحديد الموقع.";
-          document.getElementById("errorMsg").style.display = "block";
+        if (!navigator.geolocation) {
+          showError("جهازك لا يدعم تحديد الموقع.");
+          return;
         }
+
+        navigator.geolocation.getCurrentPosition(
+          function (position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            const distance = getDistance(lat, lon, targetLat, targetLng);
+
+            console.log("الموقع الحالي:", lat, lon);
+            console.log("المسافة إلى حفر الباطن:", distance.toFixed(2), "كم");
+
+            if (distance <= maxDistanceKm) {
+              const formBaseURL =
+                "https://docs.google.com/forms/d/e/1FAIpQLSdvGGgzSLSQMpDI7XnJRM2tv49w1mgZHeIiJ3h-ajxH1OcJYA/viewform";
+              const fullURL = `${formBaseURL}?entry.776050980=${lat},${lon}`;
+              window.location.href = fullURL;
+            } else {
+              showError("❌ النموذج متاح فقط داخل منطقة حفر الباطن.");
+            }
+          },
+          function (error) {
+            showError("⚠️ فشل تحديد الموقع. تأكدي أن الموقع مفعل.");
+          }
+        );
+      }
+
+      function showError(message) {
+        document.getElementById("loadingMsg").style.display = "none";
+        const errorBox = document.getElementById("errorMsg");
+        errorBox.innerText = message;
+        errorBox.style.display = "block";
       }
     </script>
   </head>
-
   <body onload="openFormWithLocation()">
     <div id="loadingMsg">
       <h2>جاري تحديد موقعك...</h2>
-      <p>يرجى الانتظار، سيتم توجيهك إلى الاستبيان خلال ثوانٍ.</p>
+      <p>يرجى الانتظار، سيتم التحقق من موقعك الآن.</p>
     </div>
 
     <div id="errorMsg"></div>
   </body>
 </html>
+
 
