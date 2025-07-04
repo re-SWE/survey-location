@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ar">
+  <head>
+    <meta charset="UTF-8" />
+    <title>فتح الاستبيان مع تحديد الموقع</title>
+    <script>
+      function openFormWithLocation() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            function (position) {
+              const lat = position.coords.latitude;
+              const lon = position.coords.longitude;
+
+              // استبدلي هذا الرابط برابط نموذجك الفعلي 👇
+              const formBaseURL =
+                "https://docs.google.com/forms/d/e/https://docs.google.com/forms/d/e/https://docs.google.com/forms/d/e/1FAIpQLSdvGGgzSLSQMpDI7XnJRM2tv49w1mgZHeIiJ3h-ajxH1OcJYA/viewform?usp=header-ajxH1OcJYA/viewform?usp=header/viewform";
+
+              // استبدلي entry.XXXXXXX برقم الحقل الخاص بالموقع في النموذج 👇
+              const fullURL = `${formBaseURL}?entry.776050980=${lat},${lon}`;
+
+              window.location.href = fullURL;
+            },
+            function (error) {
+              alert("فشل تحديد الموقع. تأكدي إن الموقع مفعّل.");
+            }
+          );
+        } else {
+          alert("جهازك لا يدعم تحديد الموقع.");
+        }
+      }
+    </script>
+  </head>
+  <body onload="openFormWithLocation()">
+    <h2>جاري تحديد موقعك...</h2>
+    <p>يرجى الانتظار، سيتم توجيهك إلى الاستبيان خلال ثوانٍ.</p>
+  </body>
+</html>
