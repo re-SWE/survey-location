@@ -2,51 +2,106 @@
 <html lang="ar">
   <head>
     <meta charset="UTF-8" />
-    <title>التحقق من الموقع</title>
+    <title>التحقق من الرمز والموقع</title>
     <style>
       body {
         font-family: Tahoma, sans-serif;
         text-align: center;
         margin-top: 100px;
       }
+      #locationDiv, #errorMsg {
+        display: none;
+      }
+      input {
+        padding: 10px;
+        font-size: 16px;
+        margin-top: 10px;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        margin-top: 15px;
+      }
       #errorMsg {
         color: red;
         font-weight: bold;
-        display: none;
       }
     </style>
-    <script>
-      const targetLat = 28.4265; // حفر الباطن
-      const targetLng = 45.9631;
-      const maxDistanceKm = 30; // نخليه مؤقتًا واسع للتأكد
+  </head>
+  <body>
+    <h2>ادخل رمز التحقق</h2>
+    <input type="text" id="codeInput" placeholder="مثال: HA2501" />
+    <br />
+    <button onclick="verifyCode()">متابعة</button>
 
-      function getDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371;
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a =
-          Math.sin(dLat / 2) ** 2 +
-          Math.cos(lat1 * Math.PI / 180) *
-            Math.cos(lat2 * Math.PI / 180) *
-            Math.sin(dLon / 2) ** 2;
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c;
+    <div id="locationDiv">
+      <p>جاري تحديد موقعك...</p>
+    </div>
+
+    <div id="errorMsg"></div>
+
+    <script>
+      const validCodes = ["HA2501"]; // قائمة الرموز المسموح بها
+      const usedCodes = JSON.parse(localStorage.getItem("usedCodes")) || [];
+
+      function verifyCode() {
+        const code = document.getElementById("codeInput").value.trim().toUpperCase();
+
+        if (!validCodes.includes(code)) {
+          showError("❌ الرمز غير صحيح.");
+          return;
+        }
+
+        if (usedCodes.includes(code)) {
+          showError("⚠️ هذا الرمز تم استخدامه من قبل.");
+          return;
+        }
+
+        // الرمز صحيح وجديد → نخزنه
+        usedCodes.push(code);
+        localStorage.setItem("usedCodes", JSON.stringify(usedCodes));
+
+        // نخفي إدخال الرمز ونبدأ التحقق من الموقع
+        document.getElementById("codeInput").style.display = "none";
+        document.querySelector("button").style.display = "none";
+        document.getElementById("locationDiv").style.display = "block";
+
+        checkLocation(); // يبدأ التحقق الجغرافي
       }
 
-      function openFormWithLocation() {
+      function showError(msg) {
+        document.getElementById("errorMsg").innerText = msg;
+        document.getElementById("errorMsg").style.display = "block";
+      }
+
+      function checkLocation() {
+        const targetLat = 28.4265;
+        const targetLng = 45.9631;
+        const maxDistanceKm = 10;
+
+        function getDistance(lat1, lon1, lat2, lon2) {
+          const R = 6371;
+          const dLat = (lat2 - lat1) * Math.PI / 180;
+          const dLon = (lon2 - lon1) * Math.PI / 180;
+          const a =
+            Math.sin(dLat / 2) ** 2 +
+            Math.cos(lat1 * Math.PI / 180) *
+              Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon / 2) ** 2;
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+          return R * c;
+        }
+
         if (!navigator.geolocation) {
-          showError("جهازك لا يدعم تحديد الموقع.");
+          showError("❌ جهازك لا يدعم تحديد الموقع.");
           return;
         }
 
         navigator.geolocation.getCurrentPosition(
-          function (position) {
-            const lat = position.coords.latitude;
-            const lon = position.coords.longitude;
+          function (pos) {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
             const distance = getDistance(lat, lon, targetLat, targetLng);
-
-            console.log("إحداثياتك:", lat, lon);
-            console.log("المسافة إلى حفر الباطن:", distance.toFixed(2));
 
             if (distance <= maxDistanceKm) {
               const formURL =
@@ -62,23 +117,10 @@
           }
         );
       }
-
-      function showError(msg) {
-        document.getElementById("loadingMsg").style.display = "none";
-        const error = document.getElementById("errorMsg");
-        error.innerText = msg;
-        error.style.display = "block";
-      }
     </script>
-  </head>
-  <body onload="openFormWithLocation()">
-    <div id="loadingMsg">
-      <h2>جارٍ تحديد موقعك...</h2>
-      <p>يرجى الانتظار.</p>
-    </div>
-    <div id="errorMsg"></div>
   </body>
 </html>
+
 
 
 
