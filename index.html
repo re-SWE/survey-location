@@ -3,7 +3,37 @@
   <head>
     <meta charset="UTF-8" />
     <title>فتح الاستبيان مع تحديد الموقع</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin-top: 100px;
+      }
+      #errorMsg {
+        color: red;
+        font-weight: bold;
+        display: none;
+      }
+    </style>
     <script>
+      // إحداثيات مركز حفر الباطن
+      const targetLat = 28.4106;
+      const targetLng = 46.7392;
+      const maxDistanceKm = 10;
+
+      function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a =
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(lat1 * Math.PI / 180) *
+          Math.cos(lat2 * Math.PI / 180) *
+          Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+      }
+
       function openFormWithLocation() {
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(
@@ -11,27 +41,52 @@
               const lat = position.coords.latitude;
               const lon = position.coords.longitude;
 
-              // استبدلي هذا الرابط برابط نموذجك الفعلي 👇
-              const formBaseURL =
-                "https://docs.google.com/forms/d/e/1FAIpQLSdvGGgzSLSQMpDI7XnJRM2tv49w1mgZHeIiJ3h-ajxH1OcJYA/viewform?usp=header";
+              const distance = getDistanceFromLatLonInKm(
+                lat,
+                lon,
+                targetLat,
+                targetLng
+              );
 
-              // استبدلي entry.XXXXXXX برقم الحقل الخاص بالموقع في النموذج 👇
-              const fullURL = `${formBaseURL}?entry.776050980=${lat},${lon}`;
+              if (distance <= maxDistanceKm) {
+                // داخل حفر الباطن: نوجّه المستخدم إلى النموذج
+                const formBaseURL =
+                  "https://docs.google.com/forms/d/e/1FAIpQLSdvGGgzSLSQMpDI7XnJRM2tv49w1mgZHeIiJ3h-ajxH1OcJYA/viewform";
 
-              window.location.href = fullURL;
+                // entry.776050980 هو رقم حقل الموقع في Google Form
+                const fullURL = `${formBaseURL}?entry.776050980=${lat},${lon}`;
+
+                window.location.href = fullURL;
+              } else {
+                // المستخدم خارج المنطقة
+                document.getElementById("loadingMsg").style.display = "none";
+                document.getElementById("errorMsg").style.display = "block";
+              }
             },
-            function (error) {
-              alert("فشل تحديد الموقع. تأكدي إن الموقع مفعّل.");
+            function () {
+              document.getElementById("loadingMsg").style.display = "none";
+              document.getElementById("errorMsg").innerText =
+                "تعذر تحديد الموقع. تأكدي أن الموقع مفعل.";
+              document.getElementById("errorMsg").style.display = "block";
             }
           );
         } else {
-          alert("جهازك لا يدعم تحديد الموقع.");
+          document.getElementById("loadingMsg").style.display = "none";
+          document.getElementById("errorMsg").innerText =
+            "المتصفح لا يدعم تحديد الموقع.";
+          document.getElementById("errorMsg").style.display = "block";
         }
       }
     </script>
   </head>
+
   <body onload="openFormWithLocation()">
-    <h2>جاري تحديد موقعك...</h2>
-    <p>يرجى الانتظار، سيتم توجيهك إلى الاستبيان خلال ثوانٍ.</p>
+    <div id="loadingMsg">
+      <h2>جاري تحديد موقعك...</h2>
+      <p>يرجى الانتظار، سيتم توجيهك إلى الاستبيان خلال ثوانٍ.</p>
+    </div>
+
+    <div id="errorMsg"></div>
   </body>
 </html>
+
