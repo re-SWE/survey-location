@@ -30,7 +30,7 @@
   </head>
   <body>
     <h2>ادخل رمز التحقق</h2>
-    <input type="text" id="codeInput" />
+    <input type="text" id="codeInput" placeholder="مثال: HA2501" />
     <br />
     <button onclick="verifyCode()">متابعة</button>
 
@@ -41,32 +41,27 @@
     <div id="errorMsg"></div>
 
     <script>
-      const validCodes = ["HA2501"]; // قائمة الرموز المسموح بها
-      const usedCodes = JSON.parse(localStorage.getItem("usedCodes")) || [];
+      const scriptURL = "https://script.google.com/macros/s/AKfycbzTh4adCnvJvfg_l_O4YIEgGkFNPMqnrPZ1bcD8339qbWQKHJTRv0ZUqUYKElshWwq9/exec";
 
       function verifyCode() {
         const code = document.getElementById("codeInput").value.trim().toUpperCase();
-
-        if (!validCodes.includes(code)) {
-          showError("❌ الرمز غير صحيح.");
-          return;
-        }
-
-        if (usedCodes.includes(code)) {
-          showError("⚠️ هذا الرمز تم استخدامه من قبل.");
-          return;
-        }
-
-        // الرمز صحيح وجديد → نخزنه
-        usedCodes.push(code);
-        localStorage.setItem("usedCodes", JSON.stringify(usedCodes));
-
-        // نخفي إدخال الرمز ونبدأ التحقق من الموقع
-        document.getElementById("codeInput").style.display = "none";
-        document.querySelector("button").style.display = "none";
-        document.getElementById("locationDiv").style.display = "block";
-
-        checkLocation(); // يبدأ التحقق الجغرافي
+        fetch(`${scriptURL}?code=${code}`)
+          .then(response => response.text())
+          .then(result => {
+            if (result === "valid") {
+              document.getElementById("locationDiv").style.display = "block";
+              document.getElementById("codeInput").style.display = "none";
+              document.querySelector("button").style.display = "none";
+              checkLocation();
+            } else if (result === "used") {
+              showError("⚠️ هذا الرمز تم استخدامه من قبل.");
+            } else {
+              showError("❌ الرمز غير صحيح.");
+            }
+          })
+          .catch(() => {
+            showError("⚠️ حدث خطأ أثناء الاتصال بالخادم.");
+          });
       }
 
       function showError(msg) {
@@ -120,6 +115,9 @@
     </script>
   </body>
 </html>
+
+    
+        
 
 
 
