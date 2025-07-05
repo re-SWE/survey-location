@@ -30,7 +30,7 @@
   </head>
   <body>
     <h2>ادخل رمز التحقق</h2>
-    <input type="text" id="codeInput"  />
+    <input type="text" id="codeInput" />
     <br />
     <button onclick="verifyCode()">متابعة</button>
 
@@ -70,7 +70,7 @@
       }
 
       function checkLocation() {
-        const targetLat = 28.4265;
+        const targetLat = 28.4265; // إحداثيات حفر الباطن
         const targetLng = 45.9631;
         const maxDistanceKm = 10;
 
@@ -80,9 +80,8 @@
           const dLon = (lon2 - lon1) * Math.PI / 180;
           const a =
             Math.sin(dLat / 2) ** 2 +
-            Math.cos(lat1 * Math.PI / 180) *
-              Math.cos(lat2 * Math.PI / 180) *
-              Math.sin(dLon / 2) ** 2;
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) ** 2;
           const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
           return R * c;
         }
@@ -99,8 +98,7 @@
             const distance = getDistance(lat, lon, targetLat, targetLng);
 
             if (distance <= maxDistanceKm) {
-              const formURL =
-                "https://docs.google.com/forms/d/e/1FAIpQLSdvGGgzSLSQMpDI7XnJRM2tv49w1mgZHeIiJ3h-ajxH1OcJYA/viewform";
+              const formURL = "https://docs.google.com/forms/d/e/1FAIpQLSdvGGgzSLSQMpDI7XnJRM2tv49w1mgZHeIiJ3h-ajxH1OcJYA/viewform";
               const fullURL = `${formURL}?entry.776050980=${lat},${lon}`;
               window.location.href = fullURL;
             } else {
@@ -115,8 +113,6 @@
     </script>
   </body>
 </html>
-
-    
         
 
 
