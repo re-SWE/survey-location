@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>التحقق من الرمز</title>
     <style>
+      * {
+        box-sizing: border-box;
+      }
+
       body {
         margin: 0;
         padding: 0;
@@ -19,50 +23,53 @@
         padding-top: 40px;
       }
 
+      .logo-container {
+        margin-bottom: 20px;
+      }
+
       .logo-container img {
-        width: 800px;
+        width: 120px;
         max-width: 25vw;
         height: auto;
-        margin-bottom: 5px;
       }
 
       .box {
         background-color: rgba(255, 255, 255, 0.08);
-        padding: 15px;
-        border-radius: 12px;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-        width: 40%;
-        max-width: 360px;
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+        width: 90%;
+        max-width: 400px;
         text-align: center;
       }
 
       h2 {
-        font-size: 20px;
+        font-size: 22px;
         margin-bottom: 20px;
       }
 
       input[type="text"] {
-        width: 90%;
-        padding: 10px;
-        font-size: 15px;
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
         border: none;
-        border-radius: 8px;
-        margin-bottom: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
         text-align: center;
         background-color: #fff;
         color: #333;
       }
 
       button {
-        width: 95%;
-        padding: 10px;
+        width: 100%;
+        padding: 12px;
         background-color: #00bcd4;
         color: white;
-        font-size: 15px;
+        font-size: 16px;
         border: none;
-        border-radius: 8px;
+        border-radius: 10px;
         cursor: pointer;
-        transition: background 0.3s;
+        transition: background 0.3s ease;
       }
 
       button:hover {
@@ -86,21 +93,20 @@
 
       @media (max-width: 500px) {
         .logo-container img {
-          width: 80px;
-        }
-
-        .box {
-          padding: 18px;
+          width: 100px;
         }
 
         h2 {
-          font-size: 18px;
+          font-size: 20px;
         }
 
         input[type="text"],
         button {
-          font-size: 14px;
-          padding: 10px;
+          font-size: 15px;
+        }
+
+        .box {
+          padding: 18px;
         }
       }
     </style>
@@ -126,10 +132,7 @@
         "https://script.google.com/macros/s/AKfycbyPTWFxHrIoH5yeHSYmBpSCe82SZyQhamCAqbId11A045260adw_SKBmVqsoIdYCrsj/exec";
 
       function verifyCode() {
-        const code = document
-          .getElementById("codeInput")
-          .value.trim()
-          .toUpperCase();
+        const code = document.getElementById("codeInput").value.trim().toUpperCase();
         fetch(`${scriptURL}?code=${code}`)
           .then((response) => response.text())
           .then((result) => {
@@ -166,8 +169,7 @@
           const dLon = ((lon2 - lon1) * Math.PI) / 180;
           const a =
             Math.sin(dLat / 2) ** 2 +
-            Math.cos((lat1 * Math.PI) / 180) *
-              Math.cos((lat2 * Math.PI) / 180) *
+            Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) *
               Math.sin(dLon / 2) ** 2;
           const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
           return R * c;
@@ -201,6 +203,7 @@
     </script>
   </body>
 </html>
+
 
 
 
