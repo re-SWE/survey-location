@@ -7,90 +7,103 @@
   <style>
     body {
       margin: 0;
+      padding: 0;
       font-family: "Tahoma", sans-serif;
       background: linear-gradient(to bottom right, #1e2a38, #3a4a5a);
       color: white;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
       flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
       text-align: center;
-      overflow: hidden;
     }
 
     .logo {
-      width: 90px;
+      width: 80px;
+      height: auto;
       margin-bottom: 20px;
       animation: fadeIn 1.5s ease-in-out;
     }
 
-    h2 {
-      margin-bottom: 10px;
-      animation: fadeIn 2s ease-in-out;
+    .container {
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 30px 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      width: 90%;
+      max-width: 400px;
+      animation: fadeInUp 1.5s ease-out;
     }
 
-    input {
+    h2 {
+      margin-bottom: 20px;
+      color: #ffffff;
+    }
+
+    input[type="text"] {
+      width: 90%;
       padding: 12px;
       font-size: 16px;
-      width: 80%;
-      max-width: 300px;
-      border: none;
       border-radius: 8px;
-      margin-top: 10px;
+      border: none;
+      outline: none;
+      margin-bottom: 15px;
       text-align: center;
-      animation: fadeIn 2.2s ease-in-out;
     }
 
     button {
-      padding: 10px 25px;
-      margin-top: 20px;
+      padding: 12px 30px;
       font-size: 16px;
-      background-color: #00aaff;
-      color: white;
       border: none;
       border-radius: 8px;
+      background-color: #00b4d8;
+      color: white;
       cursor: pointer;
-      animation: fadeIn 2.4s ease-in-out;
+      transition: background-color 0.3s;
     }
 
     button:hover {
-      background-color: #008fcc;
-    }
-
-    #locationDiv, #errorMsg {
-      margin-top: 25px;
-      animation: fadeIn 2.6s ease-in-out;
+      background-color: #0096c7;
     }
 
     #errorMsg {
-      color: #ffb3b3;
+      color: #ff6b6b;
       font-weight: bold;
+      margin-top: 15px;
+      display: none;
+    }
+
+    #locationDiv {
+      margin-top: 20px;
+      display: none;
     }
 
     @keyframes fadeIn {
-      from {opacity: 0; transform: translateY(15px);}
-      to {opacity: 1; transform: translateY(0);}
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
     }
 
-    .loading {
-      margin-top: 15px;
-      font-size: 14px;
-      color: #ccc;
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
-  <img src="https://github.com/re-SWE/survey-location/blob/main/HaLogo.png?raw=true" class="logo" alt="شعار أمانة حفر الباطن" />
-  <h2>ادخل رمز التحقق</h2>
-  <input type="text" id="codeInput" placeholder="مثال: AB123" />
-  <button onclick="verifyCode()">متابعة</button>
+  <img src="https://github.com/re-SWE/survey-location/blob/main/HaLogo.png?raw=true" alt="شعار الأمانة" class="logo" />
+  <div class="container">
+    <h2>أدخل رمز التحقق</h2>
+    <input type="text" id="codeInput" placeholder="مثال: ABC123" />
+    <br />
+    <button onclick="verifyCode()">متابعة</button>
 
-  <div id="locationDiv">
-    <p class="loading">جاري تحديد موقعك...</p>
+    <div id="locationDiv">
+      <p>جاري تحديد موقعك...</p>
+    </div>
+
+    <div id="errorMsg"></div>
   </div>
-
-  <div id="errorMsg"></div>
 
   <script>
     const scriptURL = "https://script.google.com/macros/s/AKfycbyPTWFxHrIoH5yeHSYmBpSCe82SZyQhamCAqbId11A045260adw_SKBmVqsoIdYCrsj/exec";
@@ -117,12 +130,13 @@
     }
 
     function showError(msg) {
-      document.getElementById("errorMsg").innerText = msg;
-      document.getElementById("errorMsg").style.display = "block";
+      const errorMsg = document.getElementById("errorMsg");
+      errorMsg.innerText = msg;
+      errorMsg.style.display = "block";
     }
 
     function checkLocation() {
-      const targetLat = 28.4265;
+      const targetLat = 28.4265; // حفر الباطن
       const targetLng = 45.9631;
       const maxDistanceKm = 10;
 
@@ -130,9 +144,10 @@
         const R = 6371;
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat / 2) ** 2 +
-                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                  Math.sin(dLon / 2) ** 2;
+        const a =
+          Math.sin(dLat / 2) ** 2 +
+          Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+          Math.sin(dLon / 2) ** 2;
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c;
       }
