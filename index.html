@@ -1,198 +1,206 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>التحقق من الرمز</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: "Tahoma", sans-serif;
-      background: linear-gradient(to bottom right, #1e2a38, #3a4a5a);
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      min-height: 100vh;
-      padding-top: 40px;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>التحقق من الرمز</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Tahoma", sans-serif;
+        background: linear-gradient(to bottom right, #1e2a38, #3a4a5a);
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        min-height: 100vh;
+        padding-top: 40px;
+      }
 
-    .logo-container img {
-      width: 100px;
-      max-width: 25vw;
-      height: auto;
-      margin-bottom: 25px;
-    }
-
-    .box {
-      background-color: rgba(255, 255, 255, 0.08);
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-      width: 90%;
-      max-width: 360px;
-      text-align: center;
-    }
-
-    h2 {
-      font-size: 20px;
-      margin-bottom: 15px;
-    }
-
-    input[type="text"] {
-      width: 100%;
-      padding: 10px;
-      font-size: 15px;
-      border: none;
-      border-radius: 8px;
-      margin-bottom: 15px;
-      text-align: center;
-      background-color: #fff;
-      color: #333;
-    }
-
-    button {
-      width: 100%;
-      padding: 10px;
-      background-color: #00bcd4;
-      color: white;
-      font-size: 15px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    button:hover {
-      background-color: #0097a7;
-    }
-
-    #locationDiv {
-      margin-top: 15px;
-      font-size: 14px;
-    }
-
-    #errorMsg {
-      color: #ffbaba;
-      background-color: #5a1a1a;
-      padding: 10px;
-      margin-top: 15px;
-      border-radius: 8px;
-      display: none;
-      font-size: 14px;
-    }
-
-    @media (max-width: 500px) {
       .logo-container img {
-        width: 80px;
+        width: 800px;
+        max-width: 25vw;
+        height: auto;
+        margin-bottom: 5px;
       }
 
       .box {
-        padding: 18px;
+        background-color: rgba(255, 255, 255, 0.08);
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        width: 40%;
+        max-width: 360px;
+        text-align: center;
       }
 
       h2 {
-        font-size: 18px;
+        font-size: 20px;
+        margin-bottom: 20px;
       }
 
-      input[type="text"], button {
-        font-size: 14px;
+      input[type="text"] {
+        width: 90%;
         padding: 10px;
-      }
-    }
-  </style>
-</head>
-<body>
-
-  <div class="logo-container">
-    <img src="https://github.com/re-SWE/survey-location/blob/main/HaLogo.png?raw=true" alt="شعار أمانة حفر الباطن">
-  </div>
-
-  <div class="box">
-    <h2>أدخل رمز التحقق</h2>
-    <input type="text" id="codeInput" placeholder="مثال: ABC123" />
-    <button onclick="verifyCode()">متابعة</button>
-    <div id="locationDiv">جاري تحديد موقعك...</div>
-    <div id="errorMsg"></div>
-  </div>
-
-  <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbyPTWFxHrIoH5yeHSYmBpSCe82SZyQhamCAqbId11A045260adw_SKBmVqsoIdYCrsj/exec";
-
-    function verifyCode() {
-      const code = document.getElementById("codeInput").value.trim().toUpperCase();
-      fetch(`${scriptURL}?code=${code}`)
-        .then(response => response.text())
-        .then(result => {
-          if (result === "valid") {
-            document.getElementById("locationDiv").style.display = "block";
-            document.getElementById("codeInput").style.display = "none";
-            document.querySelector("button").style.display = "none";
-            checkLocation();
-          } else if (result === "used") {
-            showError("⚠️ هذا الرمز تم استخدامه من قبل.");
-          } else {
-            showError("❌ الرمز غير صحيح.");
-          }
-        })
-        .catch(() => {
-          showError("⚠️ حدث خطأ أثناء الاتصال بالخادم.");
-        });
-    }
-
-    function showError(msg) {
-      const errorDiv = document.getElementById("errorMsg");
-      errorDiv.innerText = msg;
-      errorDiv.style.display = "block";
-    }
-
-    function checkLocation() {
-      const targetLat = 28.4265;
-      const targetLng = 45.9631;
-      const maxDistanceKm = 10;
-
-      function getDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371;
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a =
-          Math.sin(dLat / 2) ** 2 +
-          Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-          Math.sin(dLon / 2) ** 2;
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c;
+        font-size: 15px;
+        border: none;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        text-align: center;
+        background-color: #fff;
+        color: #333;
       }
 
-      if (!navigator.geolocation) {
-        showError("❌ جهازك لا يدعم تحديد الموقع.");
-        return;
+      button {
+        width: 95%;
+        padding: 10px;
+        background-color: #00bcd4;
+        color: white;
+        font-size: 15px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.3s;
       }
 
-      navigator.geolocation.getCurrentPosition(
-        function (pos) {
-          const lat = pos.coords.latitude;
-          const lon = pos.coords.longitude;
-          const distance = getDistance(lat, lon, targetLat, targetLng);
+      button:hover {
+        background-color: #0097a7;
+      }
 
-          if (distance <= maxDistanceKm) {
-            const formURL = "https://docs.google.com/forms/d/e/1FAIpQLSdvGGgzSLSQMpDI7XnJRM2tv49w1mgZHeIiJ3h-ajxH1OcJYA/viewform";
-            const fullURL = `${formURL}?entry.776050980=${lat},${lon}`;
-            window.location.href = fullURL;
-          } else {
-            showError("❌ النموذج متاح فقط داخل منطقة حفر الباطن.");
-          }
-        },
-        function () {
-          showError("⚠️ تعذر تحديد الموقع. تأكدي أن الموقع مفعّل.");
+      #locationDiv {
+        margin-top: 15px;
+        font-size: 14px;
+      }
+
+      #errorMsg {
+        color: #ffbaba;
+        background-color: #5a1a1a;
+        padding: 10px;
+        margin-top: 15px;
+        border-radius: 8px;
+        display: none;
+        font-size: 14px;
+      }
+
+      @media (max-width: 500px) {
+        .logo-container img {
+          width: 80px;
         }
-      );
-    }
-  </script>
-</body>
-</html>
 
+        .box {
+          padding: 18px;
+        }
+
+        h2 {
+          font-size: 18px;
+        }
+
+        input[type="text"],
+        button {
+          font-size: 14px;
+          padding: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="logo-container">
+      <img
+        src="https://github.com/re-SWE/survey-location/blob/main/HaLogo.png?raw=true"
+        alt="شعار أمانة حفر الباطن"
+      />
+    </div>
+
+    <div class="box">
+      <h2>أدخل رمز التحقق</h2>
+      <input type="text" id="codeInput" placeholder="مثال: ABC123" />
+      <button onclick="verifyCode()">متابعة</button>
+      <div id="locationDiv">جاري تحديد موقعك...</div>
+      <div id="errorMsg"></div>
+    </div>
+
+    <script>
+      const scriptURL =
+        "https://script.google.com/macros/s/AKfycbyPTWFxHrIoH5yeHSYmBpSCe82SZyQhamCAqbId11A045260adw_SKBmVqsoIdYCrsj/exec";
+
+      function verifyCode() {
+        const code = document
+          .getElementById("codeInput")
+          .value.trim()
+          .toUpperCase();
+        fetch(`${scriptURL}?code=${code}`)
+          .then((response) => response.text())
+          .then((result) => {
+            if (result === "valid") {
+              document.getElementById("locationDiv").style.display = "block";
+              document.getElementById("codeInput").style.display = "none";
+              document.querySelector("button").style.display = "none";
+              checkLocation();
+            } else if (result === "used") {
+              showError("⚠️ هذا الرمز تم استخدامه من قبل.");
+            } else {
+              showError("❌ الرمز غير صحيح.");
+            }
+          })
+          .catch(() => {
+            showError("⚠️ حدث خطأ أثناء الاتصال بالخادم.");
+          });
+      }
+
+      function showError(msg) {
+        const errorDiv = document.getElementById("errorMsg");
+        errorDiv.innerText = msg;
+        errorDiv.style.display = "block";
+      }
+
+      function checkLocation() {
+        const targetLat = 28.4265;
+        const targetLng = 45.9631;
+        const maxDistanceKm = 10;
+
+        function getDistance(lat1, lon1, lat2, lon2) {
+          const R = 6371;
+          const dLat = ((lat2 - lat1) * Math.PI) / 180;
+          const dLon = ((lon2 - lon1) * Math.PI) / 180;
+          const a =
+            Math.sin(dLat / 2) ** 2 +
+            Math.cos((lat1 * Math.PI) / 180) *
+              Math.cos((lat2 * Math.PI) / 180) *
+              Math.sin(dLon / 2) ** 2;
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+          return R * c;
+        }
+
+        if (!navigator.geolocation) {
+          showError("❌ جهازك لا يدعم تحديد الموقع.");
+          return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+          function (pos) {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+            const distance = getDistance(lat, lon, targetLat, targetLng);
+
+            if (distance <= maxDistanceKm) {
+              const formURL =
+                "https://docs.google.com/forms/d/e/1FAIpQLSdvGGgzSLSQMpDI7XnJRM2tv49w1mgZHeIiJ3h-ajxH1OcJYA/viewform";
+              const fullURL = `${formURL}?entry.776050980=${lat},${lon}`;
+              window.location.href = fullURL;
+            } else {
+              showError("❌ النموذج متاح فقط داخل منطقة حفرالباطن.");
+            }
+          },
+          function () {
+            showError("⚠️ تعذر تحديد الموقع. تأكد أن الموقع مفعّل.");
+          }
+        );
+      }
+    </script>
+  </body>
+</html>
 
 
 
