@@ -3,61 +3,62 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>التحقق من الرمز والموقع</title>
+  <title>التحقق من الرمز</title>
   <style>
     body {
       margin: 0;
       padding: 0;
       font-family: "Tahoma", sans-serif;
       background: linear-gradient(to bottom right, #1e2a38, #3a4a5a);
-      color: white;
+      color: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       min-height: 100vh;
-    }
-
-    .logo-container {
-      margin-bottom: 10px;
+      padding-top: 40px;
     }
 
     .logo-container img {
-      width: 90px;
+      width: 100px;
+      max-width: 25vw;
       height: auto;
+      margin-bottom: 25px;
     }
 
-    .container {
+    .box {
       background-color: rgba(255, 255, 255, 0.08);
-      padding: 30px 20px;
-      border-radius: 16px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
       width: 90%;
-      max-width: 400px;
+      max-width: 360px;
       text-align: center;
     }
 
     h2 {
-      font-size: 22px;
-      margin-bottom: 20px;
+      font-size: 20px;
+      margin-bottom: 15px;
     }
 
-    input {
+    input[type="text"] {
       width: 100%;
-      padding: 12px;
-      font-size: 16px;
+      padding: 10px;
+      font-size: 15px;
       border: none;
       border-radius: 8px;
       margin-bottom: 15px;
       text-align: center;
+      background-color: #fff;
+      color: #333;
     }
 
     button {
       width: 100%;
-      padding: 12px;
+      padding: 10px;
       background-color: #00bcd4;
       color: white;
-      font-size: 16px;
+      font-size: 15px;
       border: none;
       border-radius: 8px;
       cursor: pointer;
@@ -69,8 +70,8 @@
     }
 
     #locationDiv {
-      margin-top: 20px;
-      font-weight: bold;
+      margin-top: 15px;
+      font-size: 14px;
     }
 
     #errorMsg {
@@ -80,28 +81,36 @@
       margin-top: 15px;
       border-radius: 8px;
       display: none;
+      font-size: 14px;
     }
 
     @media (max-width: 500px) {
       .logo-container img {
-        width: 70px;
+        width: 80px;
       }
 
-      .container {
-        padding: 25px 15px;
+      .box {
+        padding: 18px;
+      }
+
+      h2 {
+        font-size: 18px;
+      }
+
+      input[type="text"], button {
+        font-size: 14px;
+        padding: 10px;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- الشعار خارج المربع -->
   <div class="logo-container">
     <img src="https://github.com/re-SWE/survey-location/blob/main/HaLogo.png?raw=true" alt="شعار أمانة حفر الباطن">
   </div>
 
-  <!-- محتوى الصفحة -->
-  <div class="container">
+  <div class="box">
     <h2>أدخل رمز التحقق</h2>
     <input type="text" id="codeInput" placeholder="مثال: ABC123" />
     <button onclick="verifyCode()">متابعة</button>
@@ -183,6 +192,7 @@
   </script>
 </body>
 </html>
+
 
 
 
