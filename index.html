@@ -1,118 +1,170 @@
 <!DOCTYPE html>
 <html lang="ar">
-  <head>
-    <meta charset="UTF-8" />
-    <title>التحقق من الرمز والموقع</title>
-    <style>
-      body {
-        font-family: Tahoma, sans-serif;
-        text-align: center;
-        margin-top: 100px;
-      }
-      #locationDiv, #errorMsg {
-        display: none;
-      }
-      input {
-        padding: 10px;
-        font-size: 16px;
-        margin-top: 10px;
-      }
-      button {
-        padding: 10px 20px;
-        font-size: 16px;
-        margin-top: 15px;
-      }
-      #errorMsg {
-        color: red;
-        font-weight: bold;
-      }
-    </style>
-  </head>
-  <body>
-    <h2>ادخل رمز التحقق</h2>
-    <input type="text" id="codeInput" />
-    <br />
-    <button onclick="verifyCode()">متابعة</button>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>التحقق من الرمز والموقع</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Tahoma", sans-serif;
+      background: linear-gradient(to bottom right, #1e2a38, #3a4a5a);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      text-align: center;
+      overflow: hidden;
+    }
 
-    <div id="locationDiv">
-      <p>جاري تحديد موقعك...</p>
-    </div>
+    .logo {
+      width: 90px;
+      margin-bottom: 20px;
+      animation: fadeIn 1.5s ease-in-out;
+    }
 
-    <div id="errorMsg"></div>
+    h2 {
+      margin-bottom: 10px;
+      animation: fadeIn 2s ease-in-out;
+    }
 
-    <script>
-      const scriptURL = "https://script.google.com/macros/s/AKfycbyPTWFxHrIoH5yeHSYmBpSCe82SZyQhamCAqbId11A045260adw_SKBmVqsoIdYCrsj/exec";
+    input {
+      padding: 12px;
+      font-size: 16px;
+      width: 80%;
+      max-width: 300px;
+      border: none;
+      border-radius: 8px;
+      margin-top: 10px;
+      text-align: center;
+      animation: fadeIn 2.2s ease-in-out;
+    }
 
-      function verifyCode() {
-        const code = document.getElementById("codeInput").value.trim().toUpperCase();
-        fetch(`${scriptURL}?code=${code}`)
-          .then(response => response.text())
-          .then(result => {
-            if (result === "valid") {
-              document.getElementById("locationDiv").style.display = "block";
-              document.getElementById("codeInput").style.display = "none";
-              document.querySelector("button").style.display = "none";
-              checkLocation();
-            } else if (result === "used") {
-              showError("⚠️ هذا الرمز تم استخدامه من قبل.");
-            } else {
-              showError("❌ الرمز غير صحيح.");
-            }
-          })
-          .catch(() => {
-            showError("⚠️ حدث خطأ أثناء الاتصال بالخادم.");
-          });
-      }
+    button {
+      padding: 10px 25px;
+      margin-top: 20px;
+      font-size: 16px;
+      background-color: #00aaff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      animation: fadeIn 2.4s ease-in-out;
+    }
 
-      function showError(msg) {
-        document.getElementById("errorMsg").innerText = msg;
-        document.getElementById("errorMsg").style.display = "block";
-      }
+    button:hover {
+      background-color: #008fcc;
+    }
 
-      function checkLocation() {
-        const targetLat = 28.4265; // إحداثيات حفر الباطن
-        const targetLng = 45.9631;
-        const maxDistanceKm = 10;
+    #locationDiv, #errorMsg {
+      margin-top: 25px;
+      animation: fadeIn 2.6s ease-in-out;
+    }
 
-        function getDistance(lat1, lon1, lat2, lon2) {
-          const R = 6371;
-          const dLat = (lat2 - lat1) * Math.PI / 180;
-          const dLon = (lon2 - lon1) * Math.PI / 180;
-          const a =
-            Math.sin(dLat / 2) ** 2 +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-            Math.sin(dLon / 2) ** 2;
-          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-          return R * c;
-        }
+    #errorMsg {
+      color: #ffb3b3;
+      font-weight: bold;
+    }
 
-        if (!navigator.geolocation) {
-          showError("❌ جهازك لا يدعم تحديد الموقع.");
-          return;
-        }
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(15px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
 
-        navigator.geolocation.getCurrentPosition(
-          function (pos) {
-            const lat = pos.coords.latitude;
-            const lon = pos.coords.longitude;
-            const distance = getDistance(lat, lon, targetLat, targetLng);
+    .loading {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <img src="1.png" class="logo" alt="شعار أمانة حفر الباطن" />
+  <h2>ادخل رمز التحقق</h2>
+  <input type="text" id="codeInput" placeholder="مثال: AB123" />
+  <button onclick="verifyCode()">متابعة</button>
 
-            if (distance <= maxDistanceKm) {
-              const formURL = "https://docs.google.com/forms/d/e/1FAIpQLSdvGGgzSLSQMpDI7XnJRM2tv49w1mgZHeIiJ3h-ajxH1OcJYA/viewform";
-              const fullURL = `${formURL}?entry.776050980=${lat},${lon}`;
-              window.location.href = fullURL;
-            } else {
-              showError("❌ النموذج متاح فقط داخل منطقة حفر الباطن.");
-            }
-          },
-          function () {
-            showError("⚠️ تعذر تحديد الموقع. تأكدي أن الموقع مفعّل.");
+  <div id="locationDiv">
+    <p class="loading">جاري تحديد موقعك...</p>
+  </div>
+
+  <div id="errorMsg"></div>
+
+  <script>
+    const scriptURL = "https://script.google.com/macros/s/AKfycbyPTWFxHrIoH5yeHSYmBpSCe82SZyQhamCAqbId11A045260adw_SKBmVqsoIdYCrsj/exec";
+
+    function verifyCode() {
+      const code = document.getElementById("codeInput").value.trim().toUpperCase();
+      fetch(`${scriptURL}?code=${code}`)
+        .then(response => response.text())
+        .then(result => {
+          if (result === "valid") {
+            document.getElementById("locationDiv").style.display = "block";
+            document.getElementById("codeInput").style.display = "none";
+            document.querySelector("button").style.display = "none";
+            checkLocation();
+          } else if (result === "used") {
+            showError("⚠️ هذا الرمز تم استخدامه من قبل.");
+          } else {
+            showError("❌ الرمز غير صحيح.");
           }
-        );
+        })
+        .catch(() => {
+          showError("⚠️ حدث خطأ أثناء الاتصال بالخادم.");
+        });
+    }
+
+    function showError(msg) {
+      document.getElementById("errorMsg").innerText = msg;
+      document.getElementById("errorMsg").style.display = "block";
+    }
+
+    function checkLocation() {
+      const targetLat = 28.4265;
+      const targetLng = 45.9631;
+      const maxDistanceKm = 10;
+
+      function getDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) ** 2 +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLon / 2) ** 2;
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
       }
-    </script>
-  </body>
+
+      if (!navigator.geolocation) {
+        showError("❌ جهازك لا يدعم تحديد الموقع.");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        function (pos) {
+          const lat = pos.coords.latitude;
+          const lon = pos.coords.longitude;
+          const distance = getDistance(lat, lon, targetLat, targetLng);
+
+          if (distance <= maxDistanceKm) {
+            const formURL = "https://docs.google.com/forms/d/e/1FAIpQLSdvGGgzSLSQMpDI7XnJRM2tv49w1mgZHeIiJ3h-ajxH1OcJYA/viewform";
+            const fullURL = `${formURL}?entry.776050980=${lat},${lon}`;
+            window.location.href = fullURL;
+          } else {
+            showError("❌ النموذج متاح فقط داخل منطقة حفر الباطن.");
+          }
+        },
+        function () {
+          showError("⚠️ تعذر تحديد الموقع. تأكدي أن الموقع مفعّل.");
+        }
+      );
+    }
+  </script>
+</body>
 </html>
+
 
         
 
